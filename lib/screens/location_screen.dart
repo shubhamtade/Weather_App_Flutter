@@ -3,6 +3,7 @@ import 'package:weather_app/utilities/constants.dart';
 import 'loading_screen.dart';
 import 'package:weather_app/services/weather.dart';
 import 'package:weather_app/screens/city_screen.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class LocationScreen extends StatefulWidget {
   LocationScreen({this.locationWeather});
@@ -31,10 +32,9 @@ class _LocationScreenState extends State<LocationScreen> {
     setState(() {
       if (weatherData == null) {
         temprature = 0;
-        WeatherIcon = 'Error';
-        WeatherMsg = "Can't fetch data";
-        cityName = '';
-        return;
+        WeatherIcon = 'NULL';
+        WeatherMsg = '';
+        cityName = 'NULL';
       }
       temprature = weatherData['main']['temp'];
       var condition = weatherData['weather'][0]['id'];
@@ -76,11 +76,18 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ),
                   FlatButton(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      var typedCityName = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => CityScreen()),
                       );
+
+                      if (typedCityName != null) {
+                        var weatherData =
+                            await weather.getCityWeather(typedCityName);
+
+                        updateUI(weatherData);
+                      }
                     },
                     child: Icon(
                       Icons.location_city,
